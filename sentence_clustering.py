@@ -25,8 +25,8 @@ def cluster_semsim_multi_multi(embed, embed_test):
     return 1 - avg_dist 
 
 print("start: tsv file import {}".format(datetime.datetime.now().time()))
-#data = np.genfromtxt("tech_auto.tsv", delimiter="\t", dtype=None, encoding=None)
-data = np.genfromtxt("legal.tsv", delimiter="\t", dtype=None, encoding=None)
+#data = np.genfromtxt("corpus/tech_auto.tsv", delimiter="\t", dtype=None, encoding=None)
+data = np.genfromtxt("corpus/legal.tsv", delimiter="\t", dtype=None, encoding=None)
 l_sentences = []
 for array in data:
     sents = split_sentences(array[4])
