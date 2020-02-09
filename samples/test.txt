@@ -1,0 +1,23 @@
+Tesla pushed back Monday against claims that its electric vehicles may suddenly accelerate on their own, calling a petition filed with federal safety regulators “completely false.”
+
+Tesla also questions the validity of the petition, noting that it was submitted by a Tesla short-seller.
+
+Last week, the National Highway Traffic and Safety Administration said it would review a defect petition that cited 127 consumer complaints of alleged unintended acceleration of Tesla electric vehicles that may have contributed to or caused 110 crashes and 52 injuries.
+
+The petition, which was first reported by CNBC, was filed by Brian Sparks, an independent investor who is currently shorting Tesla’s stock. Sparks has hedged his bets and has been long Tesla in the past, according to the CNBC report.
+
+At the time, Tesla didn’t respond to requests for comment. Now, in a blog post, the company said that it routinely reviews customer complaints of unintended acceleration with NHTSA.
+
+“In every case we reviewed with them, the data proved the vehicle functioned properly,” Tesla wrote in a blog post on its website.
+
+The automaker argued that its vehicles are designed to avoid unintended acceleration, noting that its system will default to cutting off motor torque if the two independent position sensors on its accelerator pedals register any error.
+
+“We also use the Autopilot sensor suite to help distinguish potential pedal misapplications and cut torque to mitigate or prevent accidents when we’re confident the driver’s input was unintentional,” the company wrote.
+
+Here is the complete response from Tesla:
+
+This petition is completely false and was brought by a Tesla short-seller. We investigate every single incident where the driver alleges to us that their vehicle accelerated contrary to their input, and in every case where we had the vehicle’s data, we confirmed that the car operated as designed. In other words, the car accelerates if, and only if, the driver told it to do so, and it slows or stops when the driver applies the brake.
+
+While accidents caused by a mistaken press of the accelerator pedal have been alleged for nearly every make/model of vehicle on the road, the accelerator pedals in Model S, X and 3 vehicles have two independent position sensors, and if there is any error, the system defaults to cut off motor torque. Likewise, applying the brake pedal simultaneously with the accelerator pedal will override the accelerator pedal input and cut off motor torque, and regardless of the torque, sustained braking will stop the car. Unique to Tesla, we also use the Autopilot sensor suite to help distinguish potential pedal misapplications and cut torque to mitigate or prevent accidents when we’re confident the driver’s input was unintentional. Each system is independent and records data, so we can examine exactly what happened.
+
+We are transparent with NHTSA, and routinely review customer complaints of unintended acceleration with them. Over the past several years, we discussed with NHTSA the majority of the complaints alleged in the petition. In every case we reviewed with them, the data proved the vehicle functioned properly.
