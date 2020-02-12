@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 from gensim.summarization.textcleaner import split_sentences
 import scipy.spatial
 import numpy as np
@@ -36,6 +37,7 @@ def execute(model, dist_algo, topic, path):
 	print("stop: embedder init {}".format(datetime.datetime.now().time()))
 
 #2) Check if embeddings for topic exists else read tsv topic file and create embeddings
+	# TODO: It is not enough to check if binary for embeddings already exists: we have also to check if the original raw data file has changed e.g. new data included
 	str_topic_embedding_file = 'sc_' + model + '_' + topic + '.mbd.npy' 
 	if os.path.isfile(str_topic_embedding_file):
 		print ("File embeddings exist")
@@ -67,8 +69,10 @@ def execute(model, dist_algo, topic, path):
 
 
 #4) Perform kmean clustering
-	num_clusters = 4
+
+	num_clusters = 3
 	clustering_model = KMeans(n_clusters=num_clusters, random_state=1115)
+	#clustering_model = AgglomerativeClustering(n_clusters=num_clusters, linkage="complete", affinity="euclidean")
 	clustering_model.fit(corpus_embeddings)
 	cluster_assignment = clustering_model.labels_
 
