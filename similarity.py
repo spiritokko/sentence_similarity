@@ -11,6 +11,7 @@ def run():
     parser.add_argument('-path', dest='path', default=None, help='File path of sample text')
     parser.add_argument('-model', dest='model', default='bert-large-uncased', help='')
     parser.add_argument('-dist-algo', dest='dist_algo', default='cosine', help='Which algorythm use to compute distance between N-dimensional embeddings')
+    parser.add_argument('-nclusters', dest='nclusters', default='4', help='Number of clusters expected')
     parser.add_argument('-topic', dest='topic', default='legal', help='Topic to compute similarity with text in input')
     args = parser.parse_args()
 
@@ -21,7 +22,8 @@ def run():
         model=args.model,
         dist_algo=args.dist_algo,
         topic=args.topic,
-	path=args.path 
+	path=args.path,
+	nclusters = args.nclusters 
     )
 
     model.run()

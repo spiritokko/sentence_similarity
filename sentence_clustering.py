@@ -9,14 +9,15 @@ import datetime
 import os.path
 
 class SentenceSimilarity ():
-   def __init__(self, model, dist_algo, topic, path):
+   def __init__(self, model, dist_algo, topic, path, nclusters):
       self.model = model
       self.dist_algo = dist_algo
       self.topic = topic
       self.path = path
+      self.nclusters = nclusters
    def run(self):
-      print("Starting sentence similarity model with params: {}, {}, {}, {}".format(self.model, self.dist_algo, self.topic, self.path))
-      execute(self.model, self.dist_algo, self.topic, self.path)
+      print("Starting sentence similarity model with params: {}, {}, {}, {}, {}".format(self.model, self.dist_algo, self.topic, self.path, self.nclusters))
+      execute(self.model, self.dist_algo, self.topic, self.path, self.nclusters)
       print("Exiting")
 
 
@@ -69,7 +70,7 @@ def load_or_create_topic_embedding(model, topic, embedder):
 	return corpus_test_embeddings
 
 
-def execute(model, dist_algo, topic, path):
+def execute(model, dist_algo, topic, path, nclusters):
 #1) Load model
 		
 	print("start: embedder init {}".format(datetime.datetime.now().time()))
@@ -95,7 +96,7 @@ def execute(model, dist_algo, topic, path):
 
 #4) Perform kmean clustering
 
-	num_clusters = 3
+	num_clusters = int(nclusters)
 	clustering_model = KMeans(n_clusters=num_clusters, random_state=1115)
 	clustering_model.fit(corpus_embeddings)
 	cluster_assignment = clustering_model.labels_
