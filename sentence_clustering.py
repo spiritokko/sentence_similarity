@@ -44,13 +44,13 @@ def list_topics() -> List[str]:
 	return topics
 
 def cluster_this(n_clusters, corpus_embeddings, n_init, max_iter, tol):
-
-	clustering_model = KMeans(n_clusters=n_clusters, random_state=1115, n_init=n_init, max_iter=max_iter, tol=tol)
-	clustering_model.fit(corpus_embeddings)
-	cluster_assignment = clustering_model.labels_
-	cluster_centers = clustering_model.cluster_centers_
-	#print(cluster_centers)
-	return cluster_assignment
+    print("KMeans params: {} {} {} ".format(n_init, max_iter, tol))
+    clustering_model = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter, tol=tol)
+    clustering_model.fit(corpus_embeddings)
+    cluster_assignment = clustering_model.labels_
+    cluster_centers = clustering_model.cluster_centers_
+    #print(cluster_centers)
+    return cluster_assignment
 
 
 def load_or_create_topic_embedding(model, topic, embedder):
@@ -106,22 +106,22 @@ def execute(model, dist_algo, topic, path, nclusters):
 
 #4) Perform kmean clustering
 	num_clusters = int(nclusters)
-	for iter in range(10):
-		print("@@@@@@@@@@@@@@@@@@@@@@ iter #{}: @@@@@@@@@@@@@@@@@@@@@@".format(iter))
-		cluster_assignment = cluster_this(num_clusters, corpus_embeddings, 50, iter * 1000 + 1000, 1e-6)
-		clustered_sentences  = [[] for i in range(num_clusters)]
-		clustered_embeddings = [[] for i in range(num_clusters)]
-		for sentence_id, cluster_id in enumerate(cluster_assignment):
-    			clustered_sentences[cluster_id].append(corpus[sentence_id])
-    			clustered_embeddings[cluster_id].append(corpus_embeddings[sentence_id])
+	print()
+	print("@@@@@@@@@@@@@@@@@@@@@@ iter #{}: @@@@@@@@@@@@@@@@@@@@@@".format(iter))
+	cluster_assignment = cluster_this(num_clusters, corpus_embeddings, 50, 500, 1e-6)
+	clustered_sentences  = [[] for i in range(num_clusters)]
+	clustered_embeddings = [[] for i in range(num_clusters)]
+	for sentence_id, cluster_id in enumerate(cluster_assignment):
+    		clustered_sentences[cluster_id].append(corpus[sentence_id])
+    		clustered_embeddings[cluster_id].append(corpus_embeddings[sentence_id])
 
-		for i, cluster in enumerate(clustered_sentences):
-			tpc_score = []
-			for tpc,emd in topic_embeddings.items():
-				ss = cluster_cosine_similarity(clustered_embeddings[i], emd)
-				tpc_score.append(ss)
-				print("Cluster #{}: Topic {}: Similarity {}: ".format(i+1, tpc, ss))
-			print("Cluster #{}: Reference Topic {}: Variance {}: ".format(i+1, np.amax(tpc_score), np.var(tpc_score)))
-			#print(cluster)
-			print("****************************************************************************")
+	for i, cluster in enumerate(clustered_sentences):
+		tpc_score = []
+		for tpc,emd in topic_embeddings.items():
+			ss = cluster_cosine_similarity(clustered_embeddings[i], emd)
+			tpc_score.append(ss)
+			print("Cluster #{}: Topic {}: Similarity {}: ".format(i+1, tpc, ss))
+		print("Cluster #{}: Reference Topic {}: Variance {}: ".format(i+1, np.amax(tpc_score), np.var(tpc_score)))
+		#print(cluster)
+		print("****************************************************************************")
 
