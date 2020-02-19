@@ -9,15 +9,16 @@ import datetime
 import os.path
 
 class SentenceSimilarity ():
-   def __init__(self, model, dist_algo, topic, path, nclusters):
+   def __init__(self, model, dist_algo, topic, path, nclusters, pc):
       self.model = model
       self.dist_algo = dist_algo
       self.topic = topic
       self.path = path
       self.nclusters = nclusters
+      self.pc = pc
    def run(self):
-      print("Starting sentence similarity model with params: {}, {}, {}, {}, {}".format(self.model, self.dist_algo, self.topic, self.path, self.nclusters))
-      execute(self.model, self.dist_algo, self.topic, self.path, self.nclusters)
+      print("Starting sentence similarity model with params: {}, {}, {}, {}, {}".format(self.model, self.dist_algo, self.topic, self.path, self.nclusters, self.pc))
+      execute(self.model, self.dist_algo, self.topic, self.path, self.nclusters, self.pc)
       print("Exiting")
 
 
@@ -43,9 +44,12 @@ def list_topics() -> List[str]:
 	topics = f.readlines()
 	return topics
 
-def cluster_this(n_clusters, corpus_embeddings, n_init, max_iter, tol):
+def cluster_this(n_clusters, corpus_embeddings, n_init, max_iter, tol, centroids):
     print("KMeans params: {} {} {} ".format(n_init, max_iter, tol))
-    clustering_model = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter, tol=tol)
+    if centroids is None: 
+        clustering_model = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter, tol=tol)
+    else:
+        clustering_model = KMeans(n_clusters=n_clusters, init=centroids, n_init=n_init, max_iter=max_iter, tol=tol)
     clustering_model.fit(corpus_embeddings)
     cluster_assignment = clustering_model.labels_
     cluster_centers = clustering_model.cluster_centers_
@@ -60,6 +64,7 @@ def load_or_create_topic_embedding(model, topic, embedder):
 	if os.path.isfile(str_topic_embedding_file):
 		print ("File embeddings exist")
 		corpus_test_embeddings = np.load(str_topic_embedding_file, allow_pickle=True)
+		corpus_test_embeddings_avg = np.average(corpus_test_embeddings, axis=0)
 	else:
 		print ("File embeddings not exist")
 
@@ -75,12 +80,13 @@ def load_or_create_topic_embedding(model, topic, embedder):
 
 		print("start: corpus test embedding {}".format(datetime.datetime.now().time()))
 		corpus_test_embeddings = embedder.encode(l_sentences)
+		corpus_test_embeddings_avg = np.average(corpus_test_embeddings, axis=0)
 		print("stop: corpus test embedding {}".format(datetime.datetime.now().time()))
 		np.save('sc_' + model + '_' + topic + '.mbd', corpus_test_embeddings)
-	return corpus_test_embeddings
+	return corpus_test_embeddings, corpus_test_embeddings_avg
 
 
-def execute(model, dist_algo, topic, path, nclusters):
+def execute(model, dist_algo, topic, path, nclusters, pc):
 #1) Load model
 		
 	print("start: embedder init {}".format(datetime.datetime.now().time()))
@@ -90,12 +96,13 @@ def execute(model, dist_algo, topic, path, nclusters):
 #2) Topic management: if topic parameter is a valid topic argument it is load from disk or its embedding computed. If it is all, every topic available is managed
 #   Check if embeddings for topic exists else read tsv topic file and create embeddings
 	topic_embeddings = {} 
+	topic_embeddings_avg = {} 
 	if topic == 'all':
-		topic_embeddings["Legal_terminology"] = load_or_create_topic_embedding(model, 'Legal_terminology', embedder) # Legal
-		topic_embeddings["Automotive_technologies"] = load_or_create_topic_embedding(model, 'Automotive_technologies', embedder) # Automotive
-		topic_embeddings["Investment"] = load_or_create_topic_embedding(model, 'Investment', embedder) # Finance
+		topic_embeddings["Legal_terminology"], topic_embeddings_avg["Legal_terminology"] = load_or_create_topic_embedding(model, 'Legal_terminology', embedder) # Legal
+		topic_embeddings["Automotive_technologies"], topic_embeddings_avg["Automotive_technologies"] = load_or_create_topic_embedding(model, 'Automotive_technologies', embedder) # Automotive
+		topic_embeddings["Investment"], topic_embeddings_avg["Investment"] = load_or_create_topic_embedding(model, 'Investment', embedder) # Finance
 	else:
-		topic_embeddings[topic] = load_or_create_topic_embedding(model, topic, embedder)
+		topic_embeddings[topic], topic_embeddings_avg[topic] = load_or_create_topic_embedding(model, topic, embedder)
 
 #3) Load sample file
 	f = open(path,"r")
@@ -106,9 +113,12 @@ def execute(model, dist_algo, topic, path, nclusters):
 
 #4) Perform kmean clustering
 	num_clusters = int(nclusters)
-	print()
-	print("@@@@@@@@@@@@@@@@@@@@@@ iter #{}: @@@@@@@@@@@@@@@@@@@@@@".format(iter))
-	cluster_assignment = cluster_this(num_clusters, corpus_embeddings, 50, 500, 1e-6)
+	if pc:
+		centroids = np.asarray(list(topic_embeddings_avg.values()))
+		print("centroids shape: {}".format(centroids.shape))
+		cluster_assignment = cluster_this(num_clusters, corpus_embeddings, 50, 5000, 1e-10, centroids)
+	else:
+		cluster_assignment = cluster_this(num_clusters, corpus_embeddings, 50, 5000, 1e-10, None)
 	clustered_sentences  = [[] for i in range(num_clusters)]
 	clustered_embeddings = [[] for i in range(num_clusters)]
 	for sentence_id, cluster_id in enumerate(cluster_assignment):
@@ -122,6 +132,6 @@ def execute(model, dist_algo, topic, path, nclusters):
 			tpc_score.append(ss)
 			print("Cluster #{}: Topic {}: Similarity {}: ".format(i+1, tpc, ss))
 		print("Cluster #{}: Reference Topic {}: Variance {}: ".format(i+1, np.amax(tpc_score), np.var(tpc_score)))
-		#print(cluster)
+		print(cluster)
 		print("****************************************************************************")
 
